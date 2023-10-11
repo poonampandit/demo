@@ -1,35 +1,32 @@
-var express=require('express');
-var app=express();
-var cors=require('cors')
-var bodyParser=require('body-parser')
+const model=require('./db')
+const express=require('express')
+const bodyparser=require('body-parser')
+const cors=require('cors')
+const app=express()
+
+app.use(bodyparser.json())
 app.use(cors())
-app.use(bodyParser.json())
-const model=require("./model.js")
-const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/abcd");
-  
+//api
+app.get('/',(req,res)=>
+{
+  model.find().then(p=>res.json(p)).catch(err=>console.log(err))
+})
 
-console.log("done");
-
-app.post('/login',(req, res)=>{
-
-    const {username, password } = req.body;
-   model.findOne({username}).then((data)=>{
-    if (!data) {
-        // Student not found
-        return res.status(404).json({ status: false, message: 'Student not found' });
-      }
-      if (data.password !== password) {
-        // Invalid password
-        return res.status(401).json({ status: false, message: 'Invalid password' });
-      }
-       // Successful login
-       res.status(200).json({ status: true, message: 'Login successful' });
-
-}).catch((error) => {
-    console.error(error);
-    res.status(500).json({ status: false, message: 'An error occurred' });
-  });});
+app.post('/',(req,res)=>
+{ 
+   const data=new model(
+    {
+        "username":req.body.username,
+        "password":req.body.password
+    }
+   )
+   data.save().then(p=>res.status(200).json("data saved")).catch(err=>console.log(err))
+})
 
 
-app.listen(3000,()=>console.log("server on"))
+app.listen(3000,(err)=>{
+    if(!err)
+    {
+        console.log("server is on")
+    }
+})
