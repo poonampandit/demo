@@ -1,0 +1,19 @@
+  
+
+ 
+app.post('/login', (req, res) => {
+  // Retrieve all persons from the database
+  Student.find({email:req.body.email})
+    .then(persons => {
+      if(persons[0].password===req.body.password)
+      {
+        res.status(201).json({message:"login successfully",status:true });
+      }
+      else{
+        res.status(201).json({message:"login failed!!" });
+      }
+    })
+    .catch(error => {
+      res.status(201).json({message: 'user not found!!' });
+    });
+});
